@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./laravel-web:/var/www/html
+    depends_on:
+      - app
+    networks:
+      - laravel
+
+  app:
+    build: 
+      context: .
+      dockerfile: .docker/php/Dockerfile
+    volumes:
+      - ./laravel-web:/var/www/html
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=cache
+      - QUEUE_HOST=queue
+    depends_on:
+      - db
+      - cache
+    networks:
+      - laravel
+
+  dp:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=laravelws
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=tai@123
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - laravel
+
+  cache:
+    image: redis:latest
+    networks:
+      - laravel
+
+  queue:
+    image: redis:latest
+    networks:
+      - laravel
+
+  websocket:
+    build: 
+      context: .
+      dockerfile: .docker/websocket/Dockerfile
+    ports:
+      - "6001:6001"
+    volumes:
+      - ./laravel-websocket:/var/www/html
+    depends_on:
+      - app
+    networks:
+      - laravel
+
+  networks:
+    laravel:
+
+  volumes:
+    db_data:
