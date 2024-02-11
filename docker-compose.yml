@@ -8,15 +8,17 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./laravel-web:/var/www/html
+    command: bash -c "nginx -g 'daemon off;'"
     depends_on:
       - app
     networks:
       - laravel
 
   app:
+    image: laravelws-app
     build: 
       context: .
-      dockerfile: .docker/php/Dockerfile
+      dockerfile: ./.docker/php/Dockerfile
     volumes:
       - ./laravel-web:/var/www/html
     environment:
@@ -29,14 +31,16 @@ services:
     networks:
       - laravel
 
-  dp:
+  db:
     image: mysql:8.0
     restart: unless-stopped
     environment:
       - MYSQL_DATABASE=laravelws
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=tai@123
+      - MYSQL_USER=TPD
+      - MYSQL_PASSWORD=TPD@123
+    ports:
+      - "3316:3306"
     volumes:
       - db_data:/var/lib/mysql
     networks:
@@ -53,20 +57,21 @@ services:
       - laravel
 
   websocket:
+    image: laravelws-server
     build: 
       context: .
-      dockerfile: .docker/websocket/Dockerfile
+      dockerfile: ./.docker/websocket/Dockerfile
     ports:
       - "6001:6001"
     volumes:
-      - ./laravel-websocket:/var/www/html
+      - ./laravel-web:/var/www/html
     depends_on:
       - app
     networks:
       - laravel
 
-  networks:
-    laravel:
+networks:
+  laravel:
 
-  volumes:
-    db_data:
+volumes:
+  db_data:

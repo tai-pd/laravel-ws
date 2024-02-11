@@ -22,7 +22,7 @@ RUN apt-get install -y nodejs
 # Cài đặt Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-RUN chown -R www-data:www-data /var/www/html/storage
-RUN chown -R www-data:www-data /var/www/html/bootstrap/cache
+# RUN chown -R www-data:www-data /var/www/html/storage
+# RUN chown -R www-data:www-data /var/www/html/bootstrap/cache
 
 WORKDIR /var/www/html 
