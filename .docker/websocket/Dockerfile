@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:7.1-fpm
 
 RUN apt-get update && apt-get install -y \
     libonig-dev \
@@ -16,7 +16,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
 
 # Cài đặt Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 ADD ./laravel-web /var/www/html
 
